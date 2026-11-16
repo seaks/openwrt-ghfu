@@ -14,18 +14,6 @@
 
 </div>
 
----
-
-### 📸 界面预览 | Screenshots
-
-> 💡 **想要直接体验？** 欢迎使用集成了该插件的固件：[smallprogram/OpenWrtAction](https://github.com/smallprogram/OpenWrtAction)
-
-<div align="center">
-  <img src="img/cn.png" alt="CN UI" width="48%">
-  <img src="img/cn_update.png" alt="Update Status" width="48%">
-</div>
-
----
 
 ## 🛠️ Quick Start | 快速开始
 
@@ -42,7 +30,7 @@ apk add --allow-untrusted --repositories-file /dev/null /tmp/luci-i18n-ghfu-zh-c
 将插件加入你的 OpenWrt 编译环境中：
 ```
 # 1. Add to feeds
-src-git ghfu https://github.com/smallprogram/openwrt-ghfu.git;main
+src-git ghfu https://github.com/seaks/openwrt-ghfu.git;main
 
 # 2. Update and install feeds
 ./scripts/feeds update ghfu && ./scripts/feeds install -a -p ghfu
