@@ -2,7 +2,7 @@ msgid ""
 msgstr "Content-Type: text/plain; charset=UTF-8\n"
 
 msgid "GitHub Firmware Upgrade"
-msgstr "固件升级"
+msgstr "在线升级"
 
 msgid "Firmware upgrade assistant based on GitHub Release."
 msgstr "基于 GitHub Release 的固件升级助手。"
