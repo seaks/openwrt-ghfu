@@ -5,7 +5,7 @@ msgid "GitHub Firmware Upgrade"
 msgstr "在线升级"
 
 msgid "Firmware upgrade assistant based on GitHub Release."
-msgstr "基于 GitHub Release 的固件升级助手。"
+msgstr "基于 GitHub 的固件升级助手，如无法检测到更新或超时，请确保你能访问 GitHub 网站。"
 
 msgid "Basic Configuration"
 msgstr "基础配置"
