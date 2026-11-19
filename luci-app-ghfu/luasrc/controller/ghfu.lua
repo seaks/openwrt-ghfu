@@ -16,9 +16,7 @@ local CFG = "ghfu"
 local SEC = "main"
 local tr = i18n.translate
 
--- ========= 只在这里填你的 token =========
 local GITHUB_TOKEN = "__GHFU_GITHUB_TOKEN__"
--- =========================================
 
 local function json_resp(tbl)
     http.prepare_content("application/json")
