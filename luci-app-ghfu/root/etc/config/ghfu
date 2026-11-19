@@ -1,7 +1,10 @@
+
 config ghfu 'main'
-    option github_repo 'seaks/OpenWrtAction'
-    option selected_release ''
-    option keep_config '1'
-    option fetch_timeout '30'
-    option filter_ext_enabled '1'
-    option valid_extensions '.img .img.gz .tar .itb .trx .chk .dlf .ari'
+	option github_repo 'seaks/OpenWrtAction'
+	option keep_config '1'
+	option fetch_timeout '60'
+	option cache_ttl '900'
+	option filter_ext_enabled '1'
+	option valid_extensions '.img .img.gz .tar .itb .trx .chk .dlf .ari'
+
+
