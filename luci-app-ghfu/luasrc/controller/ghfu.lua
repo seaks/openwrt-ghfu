@@ -1,6 +1,6 @@
 -- SPDX-License-Identifier: GPL-3.0-only
--- Copyright (C) 2026 smallprogram
--- Repository: https://github.com/smallprogram/luci-app-ghfu
+-- Copyright (C) 2026 seaks	
+-- Repository: https://github.com/seaks/luci-app-ghfu
 
 module("luci.controller.ghfu", package.seeall)
 
@@ -15,6 +15,10 @@ local util = require "luci.util"
 local CFG = "ghfu"
 local SEC = "main"
 local tr = i18n.translate
+
+-- ========= 只在这里填你的 token =========
+local GITHUB_TOKEN = "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"
+-- =========================================
 
 local function json_resp(tbl)
     http.prepare_content("application/json")
@@ -157,7 +161,6 @@ local function set_cfg(repo, selected_release, keep_config, fetch_timeout, filte
 end
 
 local function get_install_epoch()
-    -- Prefer dedicated flash timestamp written by uci-defaults on every post-flash boot
     local f = io.open("/etc/ghfu_flash_epoch", "r")
     if f then
         local v = f:read("*l")
@@ -167,7 +170,6 @@ local function get_install_epoch()
             return epoch
         end
     end
-    -- Fallback: mtime of /etc/openwrt_version
     local st = fs.stat("/etc/openwrt_version")
     if st and st.mtime then
         return tonumber(st.mtime) or 0
@@ -374,12 +376,23 @@ local function fetch_previous_release_with_assets(repo, timeout, accept_header, 
 end
 
 fetch_github_json = function(url, timeout, accept_header)
-    local cmd = "wget -T " .. tostring(timeout) .. " --header=" .. util.shellquote(accept_header) .. " -qO- " .. util.shellquote(url) .. " 2>/dev/null"
+    local req_url = url
+    -- 每个 header 都单独加 --header= 前缀
+    local headers = " --header=" .. util.shellquote(accept_header)
+    if GITHUB_TOKEN ~= "" then
+        headers = headers .. " --header=" .. util.shellquote("Authorization: token " .. GITHUB_TOKEN)
+    end
+    -- 加 User-Agent，GitHub 匿名/带 token 都要求
+    headers = headers .. " --header=" .. util.shellquote("User-Agent: luci-ghfu/1.0")
+    local cmd = "wget -T " .. tostring(timeout) .. headers .. " -qO- " .. util.shellquote(req_url) .. " 2>/dev/null"
     local raw = sys.exec(cmd)
 
-    -- Fallback for wget variants without custom-header support.
     if not raw or raw == "" then
-        local fallback = "wget -T " .. tostring(timeout) .. " -qO- " .. util.shellquote(url) .. " 2>/dev/null"
+        local fallback_headers = ""
+        if GITHUB_TOKEN ~= "" then
+            fallback_headers = " --header=" .. util.shellquote("Authorization: token " .. GITHUB_TOKEN)
+        end
+        local fallback = "wget -T " .. tostring(timeout) .. fallback_headers .. " -qO- " .. util.shellquote(req_url) .. " 2>/dev/null"
         raw = sys.exec(fallback)
     end
 
@@ -424,8 +437,6 @@ local function fetch_latest_release(repo, timeout)
         return latest, nil, info
     end
 
-    -- Latest release exists but assets are not ready yet (e.g. CI still uploading).
-    -- Fallback to the previous release that already has assets.
     local fallback = fetch_previous_release_with_assets(repo, t, accept, latest.tag_name)
     if fallback then
         info.fallback_used = true
@@ -477,7 +488,6 @@ function action_status()
     local repo_input = normalize_repo(http.formvalue("repo") or cfg.github_repo)
     local app_version = get_app_version()
 
-    -- Read and validate fetch_timeout from form; fall back to saved config
     local timeout_raw = trim(http.formvalue("fetch_timeout") or "")
     local fetch_timeout = tonumber(timeout_raw)
     if not fetch_timeout or fetch_timeout < 5 or fetch_timeout > 300 then
@@ -485,7 +495,6 @@ function action_status()
     end
     fetch_timeout = math.floor(fetch_timeout)
 
-    -- Persist timeout setting
     set_cfg(nil, nil, nil, tostring(fetch_timeout))
 
     if repo_input == "" then
@@ -837,7 +846,6 @@ function action_upgrade()
 
     local logs = {}
 
-    -- Prevent path traversal: only allow safe filenames
     if fw_name == "" or not fw_name:match("^[%w%._%-]+$") then
         logs[#logs + 1] = tr("Invalid firmware file name")
         json_resp({ ok = false, logs = logs })
