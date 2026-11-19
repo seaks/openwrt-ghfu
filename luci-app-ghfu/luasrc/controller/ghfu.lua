@@ -17,7 +17,7 @@ local SEC = "main"
 local tr = i18n.translate
 
 -- ========= 只在这里填你的 token =========
-local GITHUB_TOKEN = "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"
+local GITHUB_TOKEN = "__GHFU_GITHUB_TOKEN__"
 -- =========================================
 
 local function json_resp(tbl)
